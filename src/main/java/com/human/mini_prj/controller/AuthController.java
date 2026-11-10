@@ -3,8 +3,8 @@ package com.human.mini_prj.controller;
 import com.human.mini_prj.dto.LoginReqDto;
 import com.human.mini_prj.dto.LoginResDto;
 import com.human.mini_prj.dto.SignUpReqDto;
+import com.human.mini_prj.dto.TokenDto;
 import com.human.mini_prj.service.AuthService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,16 +47,8 @@ public class AuthController {
 
     // 로그인
     @PostMapping("/login")
-    public ResponseEntity<LoginResDto> login(
+    public ResponseEntity<TokenDto> login(
             @RequestBody LoginReqDto dto) {
-
-        LoginResDto result =
-                authService.login(dto.getUserId(), dto.getPwd());
-
-        if (result == null) {
-            return ResponseEntity.status(401).build();
-        }
-
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(authService.login(dto.getUserId(), dto.getPwd()));
     }
 }

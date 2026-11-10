@@ -3,6 +3,7 @@ package com.human.mini_prj.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import com.human.mini_prj.constant.Authority;
 
 import java.time.LocalDateTime;
 
@@ -31,4 +32,14 @@ public class Member {
     private String image;
 
     private LocalDateTime regDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Authority authority;
+
+    @PrePersist // DB에 INSERT 되기 전에 실행되는 메소드
+    public void prePersist() {
+        this.regDate = LocalDateTime.now(); // 현재 날짜 및 시간으로 초기화
+        this.authority = Authority.ROLE_USER;
+    }
 }

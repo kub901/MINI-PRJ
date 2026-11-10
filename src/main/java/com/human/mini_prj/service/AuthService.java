@@ -2,12 +2,16 @@ package com.human.mini_prj.service;
 
 import com.human.mini_prj.dto.LoginResDto;
 import com.human.mini_prj.dto.SignUpReqDto;
+import com.human.mini_prj.dto.TokenDto;
 import com.human.mini_prj.entity.Member;
 import com.human.mini_prj.repository.MemberRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+import com.human.mini_prj.security.TokenProvider;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -18,6 +22,7 @@ import java.util.Optional;
 public class AuthService {
 
     private final MemberRepository memberRepository;
+    private final TokenProvider tokenProvider;
 
     // 회원가입
     public boolean signUp(SignUpReqDto dto) {
@@ -48,17 +53,18 @@ public class AuthService {
         }
     }
 
-    // 아이디 로그인
-    public LoginResDto login(String userId, String pwd) {
+    // 로그인: 성공 → 토큰, 실패 → 401 (평문 비교)
+    @Transactional(readOnly = true)
+    public TokenDto login(String userId, String pwd) {
+        Member member = memberRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 일치하지 않습니다."));
 
-        Optional<Member> member =
-                memberRepository.findByUserIdAndPwd(userId, pwd);
-
-        if (member.isPresent()) {
-            return new LoginResDto(member.get());
+        // 평문 비밀번호 단순 비교
+        if (!member.getPwd().equals(pwd)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 일치하지 않습니다.");
         }
 
-        return null;
+        return tokenProvider.createToken(member.getUserId(), member.getAuthority());
     }
 
     // MyPage 회원정보 조회

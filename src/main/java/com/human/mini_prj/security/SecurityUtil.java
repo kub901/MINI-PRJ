@@ -9,7 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public final class SecurityUtil {
     private SecurityUtil() {}
 
-    public static String currentEmail() {
+    public static String currentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         // permitAll 경로에서는 "anonymousUser"가 들어 있으므로 함께 걸러냄
         if (auth == null || auth instanceof AnonymousAuthenticationToken) {
