@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+// 현재 로그인한 사용자 꺼내기
 public final class SecurityUtil {
     private SecurityUtil() {}
 
@@ -15,6 +16,6 @@ public final class SecurityUtil {
         if (auth == null || auth instanceof AnonymousAuthenticationToken) {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "로그인이 필요합니다.");
         }
-        return auth.getName();   // 토큰의 sub = email
+        return auth.getName();   // 토큰의 sub = userId
     }
 }

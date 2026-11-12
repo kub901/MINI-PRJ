@@ -42,12 +42,16 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/logout").authenticated()    // * 먼저
+                        .requestMatchers("/auth/**").permitAll()            // reissue 포함
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/board/**", "/comment/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // * 추가
                         // ⭐ 추가: 콘서트 조회 허용 (홈 화면, 목록, 상세)
                         .requestMatchers(HttpMethod.GET, "/concerts/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/seats/*/remaining").permitAll()
                         .anyRequest().authenticated())
+
                 .addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
