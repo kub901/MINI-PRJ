@@ -33,4 +33,12 @@ public class ReservationController {
 
         return reservationService.confirmPayment(reservationId);
     }
+
+    // 예매 상세 조회
+    @GetMapping("/{reservationId}")
+    public ReservationResDto getReservation(
+            @PathVariable Long reservationId) {
+
+        return reservationService.getReservation(reservationId);
+    }
 }

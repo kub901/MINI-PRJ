@@ -44,6 +44,10 @@ public class TokenProvider {
         Date accessExp = new Date(now + accessExpMs);
         Date refreshExp = new Date(now + refreshExpMs);
 
+        log.info("========== JWT 발급 확인 ==========");
+        log.info("Access 만료 설정: {}ms", accessExpMs);
+        log.info("Access 발급 시간: {}", new Date(now));
+        log.info("Access 만료 시간: {}", accessExp);
         String accessToken = Jwts.builder()
                 .subject(userId)                       // sub: 이메일
                 .claim(AUTH_KEY, authority.name())    // auth: ROLE_USER
@@ -70,12 +74,23 @@ public class TokenProvider {
     public boolean validate(String token, String expectedType) {
         try {
             Claims claims = parse(token);
-            return expectedType.equals(claims.get(TYPE_KEY, String.class));
+
+            String actualType = claims.get(TYPE_KEY, String.class);
+
+            log.info("JWT 검증 성공");
+            log.info("토큰 종류: {}", actualType);
+            log.info("기대 토큰 종류: {}", expectedType);
+            log.info("회원 ID: {}", claims.getSubject());
+
+            return expectedType.equals(actualType);
+
         } catch (ExpiredJwtException e) {
-            log.info("만료된 JWT");
+            log.error("만료된 JWT: {}", e.getMessage());
+
         } catch (JwtException | IllegalArgumentException e) {
-            log.info("잘못된 JWT: {}", e.getMessage());
+            log.error("잘못된 JWT: {}", e.getMessage());
         }
+
         return false;
     }
 

@@ -41,15 +41,23 @@ public class SecurityConfig {
                         .accessDeniedHandler((req, res, ex) -> res.sendError(403, "권한 없음")))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/error").permitAll()
-                        .requestMatchers("/auth/logout").authenticated()    // * 먼저
-                        .requestMatchers("/auth/**").permitAll()            // reissue 포함
+                        .requestMatchers("/error").permitAll()  //로그인없이 접근 가능해야함
+                        .requestMatchers("/auth/login").permitAll()
+                        .requestMatchers("/auth/signup").permitAll()
+                        .requestMatchers("/auth/reissue").permitAll()
+                        .requestMatchers("/auth/kakao/**").permitAll()
+                        .requestMatchers("/auth/exists/**").permitAll() //회원 존재 여부확인  서비스와 컨트롤러에서 조회하는것
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/board/**", "/comment/**").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN") // * 추가
-                        // ⭐ 추가: 콘서트 조회 허용 (홈 화면, 목록, 상세)
-                        .requestMatchers(HttpMethod.GET, "/concerts/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/seats/*/remaining").permitAll()
+
+                        .requestMatchers("/ws/**", "/chat/**").permitAll()     // 채팅은 JWT 제외
+                        // JWT 인증 필요
+                        .requestMatchers("/auth/mypage").authenticated()
+                        .requestMatchers("/auth/logout").authenticated()
+                        // 어드민 권한 필요
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        // 공개 조회
+                        .requestMatchers(HttpMethod.GET, "/concerts", "/concerts/**").permitAll()
                         .anyRequest().authenticated())
 
                 .addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
