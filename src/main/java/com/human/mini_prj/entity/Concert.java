@@ -1,9 +1,6 @@
 package com.human.mini_prj.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,10 +19,17 @@ public class Concert {
     // 👉 8개 섹션별로 컬럼을 각각 선언하기
     private String notice;     // 공지사항
     private String casting;    // 캐스팅 정보
+
+    @Column(columnDefinition = "TEXT")
     private String detail;     // 상품 상세
+
     private String priceInfo;  // 가격 및 할인 정보
     private String guide;      // 이용안내
     private String refund;     // 취소 및 환불 규정
     private String location;   // 장소 오시는 길
     // (리뷰의 경우 보통 리뷰 테이블을 따로 파서 연동합니다!)
+    @Column(columnDefinition = "TEXT")
+    private String story;      // 줄거리
+    @Column(columnDefinition = "TEXT")
+    private String mood;       // 분위기
 }
