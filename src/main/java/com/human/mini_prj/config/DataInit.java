@@ -178,7 +178,7 @@ public class DataInit {
                     String category = categories[i % categories.length];
 
                     concert.setTitle(category + " [" + titles[i] + "]");
-                    concert.setPrice(55000 + (i * 1500));
+                    concert.setPrice(70000 + (i * 2000));
                     concert.setPosterUrl(posters[i % posters.length]); // 카테고리 순서와 100% 일치
                     concert.setNotice((i + 1) + "회차 안내: 공연 시작 10분 전까지 입장 완료 부탁드립니다.");
                     concert.setCasting("출연진 " + (i + 1) + "팀: 국내외 최정상 실력파 아티스트 및 앙상블 군단");
@@ -189,7 +189,7 @@ public class DataInit {
 
 
 
-                    concert.setPriceInfo((70000 + (i * 2000)) + "원");
+                    concert.setPriceInfo("국가 유공자 또는 어린이는 20% 할인");
                     concert.setGuide("관람 연령: 8세 이상 관람가 / 러닝타임: 150분 (인터미션 15분 포함)");
                     concert.setRefund("관람일 7일 전까지 취소 수수료 면제");
                     concert.setLocation(locations[i % locations.length]);
