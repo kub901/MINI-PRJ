@@ -1,3 +1,4 @@
+
 package com.human.mini_prj.service;
 
 import com.human.mini_prj.dto.ScheduleReqDto;
@@ -8,17 +9,16 @@ import com.human.mini_prj.repository.ConcertScheduleRepository;
 import com.human.mini_prj.repository.SeatRepository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-@Slf4j
+
 @Service
 @RequiredArgsConstructor
 public class ConcertScheduleService {
@@ -63,19 +63,53 @@ public class ConcertScheduleService {
 
         return new ScheduleResDto(schedule);
     }
-    @EventListener(ApplicationReadyEvent.class)
+
+    // 선택한 날짜의 3개 회차 조회 또는 생성
     @Transactional
-    public void createSeatsForAllSchedules() {
+    public List<ScheduleResDto> getOrCreateSchedulesForDate(
+            Long concertId, LocalDate concertDate) {
 
-        List<ConcertSchedule> schedules =
-                concertScheduleRepository.findAll();
+        // 하루 공연 시간: 11시, 16시, 20시
+        List<LocalTime> showTimes = List.of(
+                LocalTime.of(11, 0),
+                LocalTime.of(16, 0),
+                LocalTime.of(20, 0)
+        );
 
-        for (ConcertSchedule schedule : schedules) {
+        List<ScheduleResDto> result = new ArrayList<>();
+
+        for (LocalTime showTime : showTimes) {
+
+            // 해당 날짜와 시간의 회차가 있는지 확인
+            ConcertSchedule schedule =
+                    concertScheduleRepository
+                            .findFirstByConcertIdAndConcertDateAndConcertTimeOrderByIdAsc(
+                                    concertId,
+                                    concertDate,
+                                    showTime
+                            )
+                            .orElse(null);
+
+            // 회차가 없으면 새로 생성
+            if (schedule == null) {
+                schedule = new ConcertSchedule();
+                schedule.setConcertId(concertId);
+                schedule.setConcertDate(concertDate);
+                schedule.setConcertTime(showTime);
+
+                schedule = concertScheduleRepository.save(schedule);
+            }
+
+            // 해당 회차에 없는 좌석만 생성
             createSeatsIfMissing(schedule);
+
+            result.add(new ScheduleResDto(schedule));
         }
+
+        return result;
     }
 
-    // 반드시 같은 클래스 안에 있어야 하는 메서드
+    // 기존 좌석은 유지하고 없는 좌석만 생성
     private void createSeatsIfMissing(ConcertSchedule schedule) {
 
         List<Seat> existingSeats =
