@@ -7,7 +7,7 @@ package com.human.mini_prj.rag.dto;
 public record IndexReqDto(
         Long concertId,
         String title,
-        String price,
+        int price,
         String location
 ) {
 
