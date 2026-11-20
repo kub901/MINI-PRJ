@@ -18,7 +18,7 @@ public class RagConfig {
         factory.setReadTimeout(props.timeout());
         return RestClient.builder()
                 .baseUrl(props.baseUrl())
-                .defaultHeader("X-Service-Token", props.serviceToken())
+                .defaultHeader("X-Service-Token",props.serviceToken())
                 .requestFactory(factory)
                 .build();
     }

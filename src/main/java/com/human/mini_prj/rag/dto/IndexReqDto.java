@@ -1,3 +1,4 @@
+
 package com.human.mini_prj.rag.dto;
 
 // record는 불변 데이터 전달 객체
@@ -7,8 +8,17 @@ package com.human.mini_prj.rag.dto;
 public record IndexReqDto(
         Long concertId,
         String title,
-        int price,
-        String location
+        Integer price,
+        String location,
+        String notice,
+        String casting,
+        String detail,
+        String priceInfo,
+        String guide,
+        String refund,
+        String story,
+        String mood
+
 ) {
 
 }

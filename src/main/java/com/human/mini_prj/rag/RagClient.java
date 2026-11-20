@@ -14,7 +14,7 @@ import org.springframework.web.client.RestClientResponseException;
 
 import java.util.function.Supplier;
 
-// BoardService -> RagClient -> FastAPI
+// RagIndexService -> RagClient -> FastAPI
 
 // FastAPI 호출 담당
 @Component // Spring Container에 Bean 등록
@@ -24,7 +24,7 @@ public class RagClient {
 
     public int index(IndexReqDto req) {
         IndexResDto res = call("색인", () -> ragRestClient.post()
-                .uri("/index")
+                .uri("/index/concert")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(req)
                 .retrieve()
@@ -34,7 +34,7 @@ public class RagClient {
 
     public void delete(Long concertId) {
         call("삭제", () -> ragRestClient.delete()
-                .uri("/index/{concertId}", concertId)
+                .uri("/index/concert/{concert}", concertId)
                 .retrieve()
                 .toBodilessEntity());
     }

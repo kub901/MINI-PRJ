@@ -1,3 +1,4 @@
+
 package com.human.mini_prj.rag.dto;
 
 // 답변의 근거가 되는 게시글
@@ -7,7 +8,7 @@ package com.human.mini_prj.rag.dto;
 public record SourceDto(
         Long concertId,
         String title,
-        int price,
+        Integer price,
         String location,
         String snippet,
         double score) {}
