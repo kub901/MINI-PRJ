@@ -200,6 +200,69 @@ public class ReservationService {
         return convertToDto(saved);
     }
 
+    // 예매 취소
+    @Transactional
+    public ReservationResDto cancelReservation(Long reservationId) {
+
+        // 1. 로그인한 회원 정보 조회
+        String userId = SecurityUtil.currentUserId();
+
+        Member member = memberRepository.findByUserId(userId)
+                .orElseThrow(() ->
+                        new RuntimeException("회원 정보를 찾을 수 없습니다.")
+                );
+
+        // 2. 취소할 예매 조회
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() ->
+                        new RuntimeException("예매 정보가 없습니다.")
+                );
+
+        // 3. 본인의 예매인지 확인
+        if (!reservation.getMember().getId().equals(member.getId())) {
+            throw new IllegalArgumentException(
+                    "본인의 예매만 취소할 수 있습니다."
+            );
+        }
+
+        // 4. 결제 완료 상태인지 확인
+        if (!"PAID".equals(reservation.getStatus())) {
+            throw new IllegalArgumentException(
+                    "결제가 완료된 예매만 취소할 수 있습니다."
+            );
+        }
+
+        // 5. 예매 상태를 취소로 변경
+        reservation.setStatus("CANCELLED");
+
+        // 6. 해당 예매에 연결된 좌석 조회
+        List<ReservationSeat> reservationSeats =
+                reservationSeatRepository.findByReservation_Id(reservationId);
+
+        // 7. 좌석을 다시 예매 가능 상태로 변경
+        for (ReservationSeat reservationSeat : reservationSeats) {
+
+            Seat seat = reservationSeat.getSeat();
+
+            // 결제 완료된 좌석인지 확인
+            if (!"RESERVED".equals(seat.getStatus())) {
+                throw new IllegalArgumentException(
+                        "취소할 수 없는 좌석 상태입니다."
+                );
+            }
+
+            seat.setStatus("AVAILABLE");
+            seat.setHeldReservationId(null);
+
+            seatRepository.save(seat);
+        }
+
+        // 8. 예매 정보 저장
+        Reservation saved = reservationRepository.save(reservation);
+
+        return convertToDto(saved);
+    }
+
     // 예매 정보를 화면에 전달할 DTO로 변환
     private ReservationResDto convertToDto(Reservation reservation) {
 

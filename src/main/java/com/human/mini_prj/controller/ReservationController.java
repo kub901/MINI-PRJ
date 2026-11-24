@@ -35,6 +35,14 @@ public class ReservationController {
         return reservationService.confirmPayment(reservationId);
     }
 
+    // 예매 취소
+    @PatchMapping("/{reservationId}/cancel")
+    public ReservationResDto cancelReservation(
+            @PathVariable Long reservationId) {
+
+        return reservationService.cancelReservation(reservationId);
+    }
+
     // 로그인한 회원의 예매 내역 조회
     @GetMapping("/my")
     public List<ReservationResDto> getMyReservations() {
