@@ -25,13 +25,8 @@ public interface MemberRepository extends JpaRepository <Member,Long> {
     Optional<Member> findByUserId(String userId);
     // 1. 이름이 정확히 일치하는 회원 목록 조회
 
-
-
-
-
     Optional<Member> findByUserIdAndPwd(
             String userId, String pwd
     );
     Optional<Member> findByProviderAndProviderId(Provider provider, String providerId);
-
 }

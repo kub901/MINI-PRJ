@@ -53,4 +53,14 @@ public class Member {
         this.authority = Authority.ROLE_USER;
         if (this.provider == null) this.provider = Provider.LOCAL; // 일반 가입은 LOCAL
     }
+    // 회원 탈퇴 메서드(
+    public void withdraw() {
+        this.email = "withdrawn_" + this.id + "@deleted.local";
+        this.name = "탈퇴회원";
+    }
+
+    public boolean isWithdrawn() {
+        return "탈퇴회원".equals(this.name)
+                || (this.email != null && this.email.startsWith("withdrawn_"));
+    }
 }
