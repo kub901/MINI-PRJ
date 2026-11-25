@@ -55,8 +55,10 @@ public class Member {
     }
     // 회원 탈퇴 메서드(
     public void withdraw() {
+        this.userId = "withdrawn_" + this.id;
         this.email = "withdrawn_" + this.id + "@deleted.local";
         this.name = "탈퇴회원";
+        this.phone = "000-0000-0000";
     }
 
     public boolean isWithdrawn() {

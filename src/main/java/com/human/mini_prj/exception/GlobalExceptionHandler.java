@@ -69,4 +69,10 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_GATEWAY)   // 502
                 .body(new ErrorResponse(ex.getMessage(), "RAG_UNAVAILABLE"));
     }
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalState(IllegalStateException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT) // 또는 HttpStatus.BAD_REQUEST
+                .body(new ErrorResponse(ex.getMessage(), "CONFLICT"));
+    }
 }
