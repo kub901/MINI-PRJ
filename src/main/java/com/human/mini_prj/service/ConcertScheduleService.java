@@ -136,7 +136,6 @@ public class ConcertScheduleService {
                 Seat seat = new Seat();
                 seat.setSeatNumber(seatNumber);
                 seat.setStatus("AVAILABLE");
-                seat.setPrice(10000);
                 seat.setSchedule(schedule);
 
                 newSeats.add(seat);

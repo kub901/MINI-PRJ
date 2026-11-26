@@ -10,6 +10,8 @@ import com.human.mini_prj.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.human.mini_prj.tosspay.PaymentPrepareResDto;
+import java.util.UUID;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -288,6 +290,64 @@ public class ReservationService {
         );
     }
 
+    // Toss 결제 준비
+    @Transactional(readOnly = true)
+    public PaymentPrepareResDto preparePayment(Long reservationId) {
+
+        // 1. 예약 조회
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("예약 정보가 없습니다.")
+                );
+
+        // 2. 로그인 회원 확인
+        String userId = SecurityUtil.currentUserId();
+
+        if (!reservation.getMember().getUserId().equals(userId)) {
+            throw new IllegalArgumentException("본인의 예약만 결제할 수 있습니다.");
+        }
+
+        // 3. 결제 대기 상태 확인
+        if (!"PENDING".equals(reservation.getStatus())) {
+            throw new IllegalArgumentException("결제 대기 상태의 예약만 결제할 수 있습니다.");
+        }
+
+        // 4. 결제 시간 확인
+        if (reservation.getExpiresAt() == null ||
+                !LocalDateTime.now().isBefore(reservation.getExpiresAt())) {
+            throw new IllegalArgumentException("예약 결제 시간이 만료되었습니다.");
+        }
+
+        // 5. 예약 좌석 조회
+        List<ReservationSeat> reservationSeats =
+                reservationSeatRepository.findByReservation_Id(reservationId);
+
+        if (reservationSeats.isEmpty()) {
+            throw new IllegalArgumentException("예약된 좌석이 없습니다.");
+        }
+
+        // 6. 좌석 가격 합산
+        int amount = reservationSeats.stream()
+                .mapToInt(rs -> rs.getSeat().getPrice())
+                .sum();
+
+        if (amount <= 0) {
+            throw new IllegalArgumentException("결제 금액이 올바르지 않습니다.");
+        }
+
+        // 7. Toss에 전달할 주문 정보 생성
+        String orderId = "reservation-" + reservationId + "-" +
+                UUID.randomUUID();
+
+        String orderName = "공연 예매";
+
+        return new PaymentPrepareResDto(
+                orderId,
+                orderName,
+                amount
+        );
+    }
+
     // 5분이 지난 예매 자동 만료 처리
     @Transactional
     public void expirePendingReservations() {
@@ -326,6 +386,7 @@ public class ReservationService {
                     seatRepository.save(seat);
                 }
             }
+
 
             reservationRepository.save(reservation);
         }

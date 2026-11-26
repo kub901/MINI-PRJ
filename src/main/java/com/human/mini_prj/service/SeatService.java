@@ -35,7 +35,6 @@ public class SeatService {
 
             seat.setSeatNumber(seatNumber);
             seat.setStatus("AVAILABLE");
-            seat.setPrice(10000);
             seat.setSchedule(schedule);
 
             seatRepository.save(seat);
